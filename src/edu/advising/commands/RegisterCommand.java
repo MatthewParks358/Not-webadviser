@@ -3,6 +3,7 @@ package edu.advising.commands;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
+import edu.advising.enrollment.EnrollmentContext;
 import edu.advising.notifications.NotificationManager;
 import edu.advising.notifications.ObservableStudent;
 
@@ -56,7 +57,12 @@ public class RegisterCommand extends BaseCommand {
             return;
         }
 
-        if ((this.enrollmentId = section.enroll(student)) > 0) {
+        // State Pattern: create enrollment in PENDING, then confirm to ENROLLED
+        EnrollmentContext context = EnrollmentContext.create(student.getId(), section.getId(), section);
+        context.confirm();
+        this.enrollmentId = context.getEnrollment().getId();
+
+        if (this.enrollmentId > 0) {
             executed    = true;
             successful  = true;
             System.out.printf("✓ Student %s registered for %s%n",
@@ -75,13 +81,19 @@ public class RegisterCommand extends BaseCommand {
             return;
         }
 
-        // Remove from section
-        if( section.drop(student) ) {
-            System.out.printf("↶ Undone: Registration for %s%n", section.getCourseCode());
-            this.undoneAt = LocalDateTime.now();
-            this.isUndone = true;
-            // Notify about drop
-            notificationManager.notifyRegistration(student, section.getCourseCode(), false);
+        // Use State Pattern to drop enrollment
+        try {
+            EnrollmentContext context = EnrollmentContext.loadByStudentAndSection(
+                    student.getId(), section);
+            if (context != null && context.canDrop()) {
+                context.drop("Registration undone");
+                System.out.printf("↶ Undone: Registration for %s%n", section.getCourseCode());
+                this.undoneAt = LocalDateTime.now();
+                this.isUndone = true;
+                notificationManager.notifyRegistration(student, section.getCourseCode(), false);
+            }
+        } catch (SQLException e) {
+            System.err.println("RegisterCommand undo: failed — " + e.getMessage());
         }
     }
 

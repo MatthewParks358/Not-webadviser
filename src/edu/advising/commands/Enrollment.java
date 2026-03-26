@@ -23,7 +23,7 @@ public class Enrollment {
     @Column(name = "enrollment_date")
     private LocalDateTime enrollmentDate;
     @Column(name = "status")
-    private String status; // ENROLLED, DROPPED, WITHDRAWN, COMPLETED
+    private String status; // PENDING, ENROLLED, DROPPED, WITHDRAWN, COMPLETED
     @Column(name = "grade")
     private String grade;
     @Column(name = "grade_points")

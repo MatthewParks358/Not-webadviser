@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.advising.core.DatabaseManager;
 import edu.advising.core.Table;
+import edu.advising.enrollment.EnrollmentContext;
 import edu.advising.notifications.ObservableStudent;
 import edu.advising.users.Student;
 
@@ -47,8 +48,16 @@ public class DropCommand extends BaseCommand {
         executionTime = LocalDateTime.now();
 
         if (section.drop(student)) {
-            // Update database
-            updateEnrollmentStatus("DROPPED");
+            // State Pattern: load enrollment and transition to DROPPED
+            try {
+                EnrollmentContext context = EnrollmentContext.loadByStudentAndSection(
+                        student.getId(), section);
+                if (context != null && context.canDrop()) {
+                    context.drop("Dropped by student request");
+                }
+            } catch (SQLException e) {
+                System.err.println("DropCommand: failed to load enrollment — " + e.getMessage());
+            }
 
             executed = true;
             successful = true;
@@ -78,13 +87,19 @@ public class DropCommand extends BaseCommand {
             return;
         }
 
-        // Re-enroll
-        if (section.enroll(student) > 0) {
-            updateEnrollmentStatus("ENROLLED");
-            System.out.printf("↶ Undone: Drop of %s - student re-enrolled%n",
-                    section.getCourseCode());
-            this.undoneAt = LocalDateTime.now();
-            this.isUndone = true;
+        // Re-enroll using State Pattern
+        try {
+            EnrollmentContext context = EnrollmentContext.loadByStudentAndSection(
+                    student.getId(), section);
+            if (context != null && context.canReenroll()) {
+                context.reenroll();
+                System.out.printf("↶ Undone: Drop of %s - student re-enrolled%n",
+                        section.getCourseCode());
+                this.undoneAt = LocalDateTime.now();
+                this.isUndone = true;
+            }
+        } catch (SQLException e) {
+            System.err.println("DropCommand undo: failed to load enrollment — " + e.getMessage());
         }
     }
 
@@ -98,18 +113,6 @@ public class DropCommand extends BaseCommand {
         return String.format("Drop %s (%s)", section.getCourseCode(), section.getCourseName());
     }
 
-    private void updateEnrollmentStatus(String status) {
-        // Section.drop() already updates the enrollment via ORM upsert.
-        // This method exists as a safety net for direct DropCommand use outside Section.
-        try {
-            String sql = "UPDATE enrollments SET status = ? " +
-                    "WHERE student_id = ? AND section_id = ? AND status = 'ENROLLED'";
-            dbManager.executeUpdate(sql, status, student.getId(), section.getId());
-        } catch (SQLException e) {
-            System.err.println("DropCommand: enrollment status sync failed — " + e.getMessage());
-        }
-    }
-
     private void promoteFromWaitlist() throws SQLException, IllegalAccessException {
         if (!section.getWaitlist().isEmpty() && section.hasCapacity()) {
             // Get the next waitlist entry
@@ -118,10 +121,13 @@ public class DropCommand extends BaseCommand {
             Student student = nextWaitlistEntry.getStudent();
             // Remove that student from the waitlist
             section.removeFromWaitlist(student);
-            section.enroll(student);
-            System.out.println(String.format("↑ Student ID %s promoted from waitlist", student.getStudentId()));
 
-            // In real implementation, notify the student with observer!!!
+            // Use State Pattern for enrollment
+            EnrollmentContext context = EnrollmentContext.create(
+                    student.getId(), section.getId(), section);
+            context.confirm();
+
+            System.out.printf("↑ Student ID %s promoted from waitlist%n", student.getStudentId());
         }
     }
 
