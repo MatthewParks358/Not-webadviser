@@ -1,4 +1,4 @@
-package edu.advising.enrollment.state;
+package edu.advising.enrollment.state.enroll;
 
 import edu.advising.commands.Enrollment;
 import edu.advising.enrollment.EnrollmentContext;

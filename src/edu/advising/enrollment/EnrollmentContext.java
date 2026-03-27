@@ -3,7 +3,7 @@ package edu.advising.enrollment;
 import edu.advising.commands.Enrollment;
 import edu.advising.commands.Section;
 import edu.advising.core.DatabaseManager;
-import edu.advising.enrollment.state.EnrollmentState;
+import edu.advising.enrollment.state.enroll.EnrollmentState;
 import edu.advising.enrollment.state.StateFactory;
 import edu.advising.notifications.NotificationManager;
 

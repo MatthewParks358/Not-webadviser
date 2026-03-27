@@ -1040,7 +1040,7 @@ public class DatabaseManager {
                     "position INT NOT NULL, " +
                     "added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                     "removed_date TIMESTAMP, " +
-                    "status VARCHAR(20) DEFAULT 'ACTIVE', " +  // ACTIVE, ENROLLED, REMOVED
+                    "status VARCHAR(20) DEFAULT 'ACTIVE', " +  // EXPIRED, FULFILLED, PROMPTED, REMOVED, WAITING
                     "notification_sent BOOLEAN DEFAULT FALSE, " +
                     "FOREIGN KEY (student_id) REFERENCES students(id), " +
                     "FOREIGN KEY (section_id) REFERENCES sections(id), " +

@@ -1,17 +1,17 @@
-package edu.advising.enrollment.state;
+package edu.advising.enrollment.state.enroll;
 
 import edu.advising.enrollment.EnrollmentContext;
 
 /**
- * WithdrawnState - Terminal state, no further transitions allowed
+ * CompletedState - Terminal state, course completed with final grade
  */
-public class WithdrawnState implements EnrollmentState {
+public class CompletedState implements EnrollmentState {
 
-    private static final WithdrawnState INSTANCE = new WithdrawnState();
+    private static final CompletedState INSTANCE = new CompletedState();
 
-    private WithdrawnState() {}
+    private CompletedState() {}
 
-    public static WithdrawnState getInstance() {
+    public static CompletedState getInstance() {
         return INSTANCE;
     }
 
