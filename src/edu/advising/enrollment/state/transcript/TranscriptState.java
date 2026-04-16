@@ -1,7 +1,7 @@
 package edu.advising.enrollment.state.transcript;
 
 import edu.advising.enrollment.TranscriptContext;
-
+// PENDING, PROCESSING, READY, SENT, CANCELLED, FAILED
 public interface TranscriptState {
 
     // Transitions
