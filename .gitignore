@@ -47,3 +47,6 @@ log/
 # Operating System files
 .DS_Store # Mac
 Thumbs.db # Windows
+
+# Claude Code local settings
+.claude/
