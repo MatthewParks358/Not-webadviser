@@ -38,6 +38,12 @@ public class Section {
     private int facultyId; // References faculty
     @Column(name = "room")
     private String room;
+    @Column(name = "meeting_days")
+    private String meetingDays; // ex: "MWF" or "TR"
+    @Column(name = "start_time")
+    private String startTime; // ex: "10:00"
+    @Column(name = "end_time")
+    private String endTime; // ex: "11:15"
     @Column(name = "status")
     private String status;  //OPEN, CLOSED, CANCELLED
     @ManyToOne(targetEntity = Course.class, joinColumn = "course_id")
@@ -280,6 +286,30 @@ public class Section {
 
     public void setRoom(String room) {
         this.room = room;
+    }
+
+    public String getMeetingDays() {
+        return meetingDays;
+    }
+
+    public void setMeetingDays(String meetingDays) {
+        this.meetingDays = meetingDays;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public String getStatus() {
