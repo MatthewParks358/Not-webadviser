@@ -3,10 +3,20 @@ package edu.advising.enrollment.state.transcript;
 import edu.advising.commands.Enrollment;
 import edu.advising.enrollment.TranscriptContext;
 import edu.advising.enrollment.state.enroll.EnrolledState;
+import edu.advising.enrollment.state.enroll.PendingEnrollmentState;
 
 import java.time.LocalDateTime;
 
 public class PendingTranscriptState implements TranscriptState {
+
+    private static final PendingTranscriptState INSTANCE = new PendingTranscriptState();
+
+    private PendingTranscriptState() {}
+
+    public static PendingTranscriptState getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public void beginProcessing(TranscriptContext context) {
         Enrollment enrollment = context.getEnrollment();

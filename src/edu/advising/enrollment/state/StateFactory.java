@@ -27,7 +27,7 @@ public class StateFactory {
                 throw new IllegalArgumentException("Unknown enrollment status: " + status);
         }
     }
-
+/*
     public static TranscriptState transcriptStateFor(String status) {
         if (status == null) {
             return PendingEnrollmentState.getInstance();
@@ -48,5 +48,5 @@ public class StateFactory {
             default:
                 throw new IllegalArgumentException("Unknown enrollment status: " + status);
         }
-    }
+    }*/
 }
