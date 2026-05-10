@@ -1,0 +1,54 @@
+classDiagram
+    direction TB
+
+
+
+    class CourseFactory:::core {
+        <<abstract>>
+        +createCourse(code: String, name: String, description: String, departmentId: int) Course*
+        +offerCourse(code: String, name: String, description: String, departmentId: int) Course
+        #saveCourse(course: Course) void
+    }
+
+    class UndergraduateCourseFactory:::core {
+        -DEFAULT_CREDITS: double = 3.0
+        -LEVEL: String = "UNDERGRADUATE"
+        +createCourse(code: String, name: String, description: String, departmentId: int) Course
+    }
+
+    class GraduateCourseFactory:::core {
+        -DEFAULT_CREDITS: double = 4.0
+        -LEVEL: String = "GRADUATE"
+        +createCourse(code: String, name: String, description: String, departmentId: int) Course
+    }
+
+
+    class Course {
+        -id: int
+        -code: String
+        -name: String
+        -description: String
+        -credits: double
+        -departmentId: int
+        -level: String
+        -isActive: boolean
+        +getCode() String
+        +getName() String
+        +getLevel() String
+        +isActive() boolean
+    }
+
+
+    class DatabaseManager {
+        <<Singleton>>
+        +getInstance()$ DatabaseManager
+        +upsert(entity: T) void
+    }
+
+
+    CourseFactory <|-- UndergraduateCourseFactory : extends
+    CourseFactory <|-- GraduateCourseFactory      : extends
+    CourseFactory ..> Course                       : «creates»
+    CourseFactory ..> DatabaseManager              : persists via getInstance()
+
+
