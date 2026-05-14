@@ -1,0 +1,59 @@
+---
+title: "View Schedule - Sprint 4"
+---
+classDiagram
+
+    class ViewScheduleCommand {
+        -student: Student
+        -semester: String
+        -year: int
+        +ViewScheduleCommand(student, semester, year)
+        +execute() void
+        +undo() void
+        +isUndoable() boolean
+        +getDescription() String
+    }
+
+    class Student {
+        -studentId: String
+        -firstName: String
+        -lastName: String
+        +getSections() List~Section~
+    }
+
+    class Section {
+        -sectionNumber: String
+        -semester: String
+        -year: int
+        -room: String
+        -meetingDays: String
+        -startTime: String
+        -endTime: String
+        +getCourse() Course
+        +getFaculty() Faculty
+    }
+
+    class Course {
+        -code: String
+        -name: String
+        -credits: double
+    }
+
+    class Faculty {
+        -firstName: String
+        -lastName: String
+    }
+
+    ViewScheduleCommand --> Student : uses
+    Student --> Section : has enrolled sections
+    Section --> Course : has
+    Section --> Faculty : has
+
+%% Pseudo code for execute():
+%%
+%% execute():
+%%   print student name and semester/year header
+%%   get list of sections from the student
+%%   loop through each section:
+%%     print course code, section number, days, time, room, instructor
+%%   print total credits at the bottom
